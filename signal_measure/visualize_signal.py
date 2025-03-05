@@ -103,7 +103,6 @@ class SignalVisualizer(Node):
             pointcloud_data.append(struct.pack('fffI', x, y, z, rgb))
         return b''.join(pointcloud_data)
 
-
 def compare_points(p1: Point, p2: Point, tolerance=1e-2):
 
     if p1 is not None and p2 is not None:
