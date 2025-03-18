@@ -4,7 +4,7 @@ from rclpy.node import Node
 from std_msgs.msg import Float32
 import math
 from geometry_msgs.msg import Point
-
+from nav_msgs.msg import Odometry
 
 class SignalPublisher(Node):
 
@@ -13,6 +13,12 @@ class SignalPublisher(Node):
         self.publisher_ = self.create_publisher(Float32, 'signal', 10)
         timer_period = 1  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.subscription = self.create_subscription(
+        Odometry,
+        '/odom',
+        self.odom_callback,
+        10)
+        
         """
         :param p0: Signal strength at reference distance (dBm)
         :param n: Path loss exponent (environment-dependent, 2-4)
@@ -20,6 +26,17 @@ class SignalPublisher(Node):
         # Fake params for path loss model
         self.p0 = -40
         self.n = 3
+
+        self.x = None
+        self.y = None
+
+
+    def odom_callback(self, msg):
+        # Extract the position from the odometry message
+        self.latest_position = msg.pose.pose.position
+        self.latest_timestamp = msg.header.stamp
+        self.x = self.latest_position.x
+        self.y = self.latest_position.y
 
     def get_wifi_signal_strength(self):
         """
